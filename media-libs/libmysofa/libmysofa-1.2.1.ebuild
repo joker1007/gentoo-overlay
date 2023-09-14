@@ -22,8 +22,7 @@ CMAKE_BUILD_TYPE=Release
 
 src_prepare() {
 	default
-
-	cmake-utils_src_prepare
+	cmake_src_prepare
 }
 
 src_configure() {
