@@ -1,1 +1,0 @@
-liquidctl-1.7.2.ebuild
