@@ -25,6 +25,5 @@ src_install() {
 	doins -r usr
 	fperms +x /usr/bin/export-gpu
 	fperms +x /usr/bin/gamescope-session-plus
-	fperms +x /usr/libexec/gamescope-sdl-workaround
 	fperms +x /usr/share/gamescope-session-plus/gamescope-session-plus
 }
