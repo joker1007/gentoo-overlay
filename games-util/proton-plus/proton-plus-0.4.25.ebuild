@@ -3,7 +3,7 @@ EAPI=8
 inherit meson xdg gnome2-utils
 
 DESCRIPTION="A modern compatibility tools manager for Linux. "
-HOMEPAGE="https://github.com/Vladimir-csp/uwsm"
+HOMEPAGE="https://github.com/Vysp3r/ProtonPlus"
 SRC_URI="https://github.com/Vysp3r/ProtonPlus/archive/refs/tags/v${PV}.tar.gz"
 
 LICENSE="GPL-3"
