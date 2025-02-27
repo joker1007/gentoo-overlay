@@ -11,12 +11,13 @@ PROPERTIES="live"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="+uuctl +fumon +uwsm-app"
+IUSE="+uuctl +fumon +uwsm-app +uwsm-select"
 
 RDEPEND="
 	dev-python/pyxdg
 	dev-python/dbus-python
 	sys-apps/dbus-broker
+	uwsm-select? ( dev-libs/newt )
 "
 DEPEND="${RDEPEND}"
 
