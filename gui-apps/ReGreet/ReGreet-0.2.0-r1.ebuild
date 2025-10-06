@@ -217,7 +217,7 @@ LICENSE="GPL-3"
 SLOT="0"
 
 RDEPEND="
-	|| ( gui-wm/sway gui-wm/cage )
+	|| ( gui-wm/sway gui-wm/cage gui-wm/hyprland )
 	systemd? ( sys-apps/systemd[sysv-utils] )
 	openrc? ( sys-apps/openrc[sysv-utils] )
 	gui-libs/gtk
