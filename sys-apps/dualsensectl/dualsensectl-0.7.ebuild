@@ -7,7 +7,7 @@ inherit meson shell-completion
 
 DESCRIPTION="Linux tool for controlling PS5 DualSense controller "
 HOMEPAGE="https://github.com/nowrep/dualsensectl"
-SRC_URI="https://github.com/nowrep/dualsensectl/archive/refs/tags/v0.7.tar.gz"
+SRC_URI="https://github.com/nowrep/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
