@@ -4,7 +4,7 @@ inherit meson xdg gnome2-utils
 
 DESCRIPTION="A modern compatibility tools manager for Linux. "
 HOMEPAGE="https://github.com/Vysp3r/ProtonPlus"
-SRC_URI="https://github.com/Vysp3r/ProtonPlus/archive/refs/tags/v${PV}.tar.gz"
+SRC_URI="https://github.com/Vysp3r/ProtonPlus/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
@@ -15,6 +15,7 @@ RDEPEND="
 	dev-lang/vala
 	gui-libs/gtk
 	gui-libs/libadwaita
+	dev-libs/json-glib
 	net-libs/libsoup
 	app-arch/libarchive
 	dev-util/desktop-file-utils
