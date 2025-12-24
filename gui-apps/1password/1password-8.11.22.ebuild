@@ -52,8 +52,7 @@ src_install() {
 	dosym -r /opt/1Password/1password /usr/bin/1password
 	dosym -r /opt/1Password/op-ssh-sign /usr/bin/op-ssh-sign
 
-	insinto /usr/share/applications
-	doins /opt/1Password/resources/1password.desktop
+	domenu /opt/1Password/resources/1password.desktop
 	newicon "${ED}/opt/1Password/resources/icons/hicolor/512x512/apps/1password.png" "${PN}.png"
 
 	dodoc "${ED}/opt/1Password/resources/custom_allowed_browsers"
