@@ -5,8 +5,8 @@ EAPI=8
 
 inherit cmake
 
-DESCRIPTION="Hyprland QT/qml utility apps"
-HOMEPAGE="https://github.com/hyprwm/hyprland-guiutils"
+DESCRIPTION="A modern C++ Wayland-native GUI toolkit"
+HOMEPAGE="https://github.com/hyprwm/hyprtoolkit"
 SRC_URI="https://github.com/hyprwm/${PN}/archive/refs/tags/v${PV}/v${PV}.tar.gz -> ${P}.gh.tar.gz"
 
 LICENSE="BSD"
