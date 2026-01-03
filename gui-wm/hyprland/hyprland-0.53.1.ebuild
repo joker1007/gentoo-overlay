@@ -65,7 +65,7 @@ RDEPEND="
 "
 DEPEND="
 	${RDEPEND}
-	dev-cpp/glaze
+	>=dev-cpp/glaze-6.1.0
 	>=dev-libs/hyprland-protocols-0.6.4
 	>=dev-libs/wayland-protocols-1.45
 "
