@@ -45,7 +45,7 @@ RDEPEND="
 	>=gui-libs/aquamarine-0.9.3:=
 	>=gui-libs/hyprcursor-0.1.9
 	>=gui-libs/hyprutils-0.8.4:=
-	>=dev-libs/hyprwire-0.2.0
+	dev-libs/hyprwire
 	media-libs/libglvnd
 	media-libs/mesa
 	sys-apps/util-linux
