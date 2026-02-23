@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>joker1007@gmail.com</email>
+		<name>joker1007</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">limo-app/limo</remote-id>
+	</upstream>
+</pkgmetadata>
