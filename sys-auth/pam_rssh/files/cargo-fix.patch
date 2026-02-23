@@ -1,0 +1,11 @@
+--- a/Cargo.toml	2026-02-21 17:03:03.932511705 +0900
++++ b/Cargo.toml	2026-02-21 17:03:10.612169958 +0900
+@@ -10,7 +10,7 @@
+ 
+ [dependencies]
+ pam-bindings = "0.1.1"
+-ssh-agent = { path = "./dep/ssh-agent.rs" }
++ssh-agent = { path = "../ssh-agent.rs-802b94ccf2e00ac33a3863300d0769f02b62d807/" }
+ multisock = "^1.0.0"
+ byteorder = "1.5.0"
+ base64 = "^0.22.1"

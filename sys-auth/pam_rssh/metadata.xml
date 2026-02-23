@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<longdescription>
+pam_rssh is a PAM module that allows authentication via SSH agent.
+It forwards authentication requests to the client-side SSH agent as
+signature requests, enabling passwordless sudo by touching a hardware
+security key (e.g. Yubikey, Canokey). Supports RSA, DSA, ECDSA,
+ED25519, and FIDO2-based SSH keys.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/z4yx/pam_rssh/issues</bugs-to>
+		<changelog>https://github.com/z4yx/pam_rssh/releases</changelog>
+		<remote-id type="github">z4yx/pam_rssh</remote-id>
+	</upstream>
+</pkgmetadata>
