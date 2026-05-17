@@ -1,0 +1,184 @@
+diff -urN '--exclude=consts.h' limo-orig/CMakeLists.txt limo-1.2.2/CMakeLists.txt
+--- a/CMakeLists.txt	2025-05-03 18:00:07.000000000 +0900
++++ b/CMakeLists.txt	2026-05-18 03:44:13.056819541 +0900
+@@ -32,8 +32,8 @@
+ find_package(OpenSSL REQUIRED)
+ 
+ # Qt
+-find_package(QT NAMES Qt5 REQUIRED COMPONENTS Widgets)
+-find_package(Qt5 REQUIRED COMPONENTS Widgets Svg Network)
++find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets)
++find_package(Qt6 REQUIRED COMPONENTS Widgets Svg SvgWidgets Network Core5Compat)
+ 
+ # libunrar
+ if(NOT DEFINED LIBUNRAR_INCLUDE_DIR)
+@@ -356,7 +356,9 @@
+     PRIVATE core
+     PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+     PRIVATE Qt${QT_VERSION_MAJOR}::Svg
+-    PRIVATE Qt${QT_VERSION_MAJOR}::Network)
++    PRIVATE Qt${QT_VERSION_MAJOR}::SvgWidgets
++    PRIVATE Qt${QT_VERSION_MAJOR}::Network
++    PRIVATE Qt${QT_VERSION_MAJOR}::Core5Compat)
+ 
+ install(PROGRAMS ${CMAKE_BINARY_DIR}/Limo
+     DESTINATION bin RENAME limo)
+diff -urN '--exclude=consts.h' limo-orig/src/core/progressnode.h limo-1.2.2/src/core/progressnode.h
+--- a/src/core/progressnode.h	2025-05-03 18:00:07.000000000 +0900
++++ b/src/core/progressnode.h	2026-05-18 03:44:18.641891419 +0900
+@@ -5,6 +5,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <functional>
+ #include <memory>
+ #include <optional>
+diff -urN '--exclude=consts.h' limo-orig/src/core/versionchangelog.cpp limo-1.2.2/src/core/versionchangelog.cpp
+--- a/src/core/versionchangelog.cpp	2025-05-03 18:00:07.000000000 +0900
++++ b/src/core/versionchangelog.cpp	2026-05-18 03:44:26.230989096 +0900
+@@ -1,6 +1,7 @@
+ #include "versionchangelog.h"
+ #include <algorithm>
+ #include <chrono>
++#include <iomanip>
+ 
+ 
+ VersionChangelog::VersionChangelog(const Json::Value& json)
+diff -urN '--exclude=consts.h' limo-orig/src/ui/backuplistmodel.cpp limo-1.2.2/src/ui/backuplistmodel.cpp
+--- a/src/ui/backuplistmodel.cpp	2025-05-03 18:00:07.000000000 +0900
++++ b/src/ui/backuplistmodel.cpp	2026-05-18 03:44:56.045372909 +0900
+@@ -71,13 +71,13 @@
+   if(role == num_backups_role)
+   {
+     QVariant var;
+-    var.setValue<size_t>(targets_[row].backup_names.size());
++    var.setValue(static_cast<size_t>(targets_[row].backup_names.size()));
+     return var;
+   }
+   if(role == num_targets_role)
+   {
+     QVariant var;
+-    var.setValue<size_t>(targets_.size());
++    var.setValue(static_cast<size_t>(targets_.size()));
+     return var;
+   }
+   if(role == target_name_role && row < targets_.size())
+diff -urN '--exclude=consts.h' limo-orig/src/ui/deployerlistmodel.cpp limo-1.2.2/src/ui/deployerlistmodel.cpp
+--- a/src/ui/deployerlistmodel.cpp	2025-05-03 18:00:07.000000000 +0900
++++ b/src/ui/deployerlistmodel.cpp	2026-05-18 03:44:47.750266108 +0900
+@@ -122,7 +122,7 @@
+   if(role == valid_mod_actions_role)
+   {
+     QVariant var;
+-    var.setValue<std::vector<int>>(deployer_info_.valid_mod_actions[row]);
++    var.setValue(deployer_info_.valid_mod_actions[row]);
+     return var;
+   }
+   return QVariant();
+diff -urN '--exclude=consts.h' limo-orig/src/ui/fomodcheckbox.cpp limo-1.2.2/src/ui/fomodcheckbox.cpp
+--- a/src/ui/fomodcheckbox.cpp	2025-05-03 18:00:07.000000000 +0900
++++ b/src/ui/fomodcheckbox.cpp	2026-05-18 03:45:05.880499550 +0900
+@@ -12,7 +12,7 @@
+   setText(text);
+ }
+ 
+-void FomodCheckBox::enterEvent(QEvent* event)
++void FomodCheckBox::enterEvent(QEnterEvent* event)
+ {
+   description_label_->setText(description_);
+   QPixmap pixmap(image_path_);
+diff -urN '--exclude=consts.h' limo-orig/src/ui/fomodcheckbox.h limo-1.2.2/src/ui/fomodcheckbox.h
+--- a/src/ui/fomodcheckbox.h	2025-05-03 18:00:07.000000000 +0900
++++ b/src/ui/fomodcheckbox.h	2026-05-18 03:45:00.781433891 +0900
+@@ -39,7 +39,7 @@
+    * info panel.
+    * \param event The source event.
+    */
+-  void enterEvent(QEvent* event) override;
++  void enterEvent(QEnterEvent* event) override;
+ 
+ private:
+   /*! \brief Description of the plugin represented by this button. */
+diff -urN '--exclude=consts.h' limo-orig/src/ui/fomodradiobutton.cpp limo-1.2.2/src/ui/fomodradiobutton.cpp
+--- a/src/ui/fomodradiobutton.cpp	2025-05-03 18:00:07.000000000 +0900
++++ b/src/ui/fomodradiobutton.cpp	2026-05-18 03:45:13.465597234 +0900
+@@ -12,7 +12,7 @@
+   setText(text);
+ }
+ 
+-void FomodRadioButton::enterEvent(QEvent* event)
++void FomodRadioButton::enterEvent(QEnterEvent* event)
+ {
+   description_label_->setText(description_);
+   QPixmap pixmap(image_path_);
+diff -urN '--exclude=consts.h' limo-orig/src/ui/fomodradiobutton.h limo-1.2.2/src/ui/fomodradiobutton.h
+--- a/src/ui/fomodradiobutton.h	2025-05-03 18:00:07.000000000 +0900
++++ b/src/ui/fomodradiobutton.h	2026-05-18 03:45:10.049553243 +0900
+@@ -39,7 +39,7 @@
+    * info panel.
+    * \param event The source event.
+    */
+-  void enterEvent(QEvent* event) override;
++  void enterEvent(QEnterEvent* event) override;
+ 
+ private:
+   /*! \brief Description of the plugin represented by this button. */
+diff -urN '--exclude=consts.h' limo-orig/src/ui/mainwindow.cpp limo-1.2.2/src/ui/mainwindow.cpp
+--- a/src/ui/mainwindow.cpp	2025-05-03 18:00:07.000000000 +0900
++++ b/src/ui/mainwindow.cpp	2026-05-18 03:45:21.424699749 +0900
+@@ -1029,7 +1029,7 @@
+                   .toStdString());
+       delete watcher;
+     });
+-  auto future = QtConcurrent::run(this, &MainWindow::runCommand, command, ignore_flatpak);
++  auto future = QtConcurrent::run(&MainWindow::runCommand, this, command, ignore_flatpak);
+   watcher->setFuture(future);
+ }
+ 
+@@ -2206,7 +2206,7 @@
+   layout->insertSpacing(0, 375);
+   layout->addWidget(progress_bar_);
+   layout->setSpacing(0);
+-  layout->setMargin(0);
++  layout->setContentsMargins(0, 0, 0, 0);
+   layout->setAlignment(Qt::AlignCenter);
+   container->setLayout(layout);
+   container->setMaximumHeight(15);
+diff -urN '--exclude=consts.h' limo-orig/src/ui/modlistmodel.cpp limo-1.2.2/src/ui/modlistmodel.cpp
+--- a/src/ui/modlistmodel.cpp	2025-05-03 18:00:07.000000000 +0900
++++ b/src/ui/modlistmodel.cpp	2026-05-18 03:44:43.867216120 +0900
+@@ -123,7 +123,7 @@
+   if(role == group_members_role)
+   {
+     QVariant var;
+-    var.setValue<std::vector<int>>(groups_.at(active_mods_[row].group));
++    var.setValue(groups_.at(active_mods_[row].group));
+     return var;
+   }
+   if(role == mod_group_role)
+@@ -131,13 +131,13 @@
+   if(role == deployer_ids_role)
+   {
+     QVariant var;
+-    var.setValue<std::vector<int>>(active_mods_[row].deployer_ids);
++    var.setValue(active_mods_[row].deployer_ids);
+     return var;
+   }
+   if(role == statuses_role)
+   {
+     QVariant var;
+-    var.setValue<std::vector<bool>>(active_mods_[row].deployer_statuses);
++    var.setValue(active_mods_[row].deployer_statuses);
+     return var;
+   }
+   if(role == manual_tags_role)
+@@ -163,7 +163,7 @@
+   if(role == mod_size_role)
+   {
+     QVariant var;
+-    var.setValue<unsigned long>(active_mods_.at(row).mod.size_on_disk);
++    var.setValue(static_cast<unsigned long>(active_mods_.at(row).mod.size_on_disk));
+     return var;
+   }
+   if(role == mod_version_role)
