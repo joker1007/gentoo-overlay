@@ -1,0 +1,293 @@
+# Copyright 2025 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=8
+
+CRATES="
+	adler2@2.0.0
+	aho-corasick@1.1.3
+	aligned-vec@0.5.0
+	android_system_properties@0.1.5
+	anstream@0.6.18
+	anstyle-parse@0.2.6
+	anstyle-query@1.1.2
+	anstyle-wincon@3.0.7
+	anstyle@1.0.10
+	anyhow@1.0.97
+	arbitrary@1.4.1
+	arg_enum_proc_macro@0.3.4
+	arrayvec@0.7.6
+	async-channel@2.3.1
+	autocfg@1.4.0
+	av1-grain@0.2.3
+	avif-serialize@0.8.3
+	bit_field@0.10.2
+	bitflags@1.3.2
+	bitflags@2.9.0
+	bitstream-io@2.6.0
+	block@0.1.6
+	built@0.7.7
+	bumpalo@3.17.0
+	bytemuck@1.22.0
+	byteorder-lite@0.1.0
+	byteorder@1.5.0
+	cairo-rs@0.20.7
+	cairo-sys-rs@0.20.7
+	cc@1.2.16
+	cfg-expr@0.15.8
+	cfg-expr@0.17.2
+	cfg-if@1.0.0
+	chrono@0.4.43
+	clap@4.5.31
+	clap_builder@4.5.31
+	clap_derive@4.5.28
+	clap_lex@0.7.4
+	color_quant@1.1.0
+	colorchoice@1.0.3
+	concurrent-queue@2.5.0
+	core-foundation-sys@0.8.7
+	crc32fast@1.4.2
+	crossbeam-deque@0.8.6
+	crossbeam-epoch@0.9.18
+	crossbeam-utils@0.8.21
+	crunchy@0.2.3
+	either@1.15.0
+	env_home@0.1.0
+	equivalent@1.0.2
+	errno@0.3.10
+	event-listener-strategy@0.5.3
+	event-listener@5.4.0
+	exr@1.73.0
+	fallible-iterator@0.3.0
+	fallible-streaming-iterator@0.1.9
+	fdeflate@0.3.7
+	field-offset@0.3.6
+	flate2@1.1.0
+	foldhash@0.1.4
+	futures-channel@0.3.31
+	futures-core@0.3.31
+	futures-executor@0.3.31
+	futures-io@0.3.31
+	futures-macro@0.3.31
+	futures-task@0.3.31
+	futures-util@0.3.31
+	gdk-pixbuf-sys@0.20.7
+	gdk-pixbuf@0.20.9
+	gdk4-sys@0.9.6
+	gdk4@0.9.6
+	getrandom@0.2.15
+	getrandom@0.3.4
+	gettext-rs@0.7.2
+	gettext-sys@0.22.5
+	gif@0.13.1
+	gio-sys@0.20.9
+	gio@0.20.9
+	glib-macros@0.20.7
+	glib-sys@0.20.9
+	glib@0.20.9
+	gobject-sys@0.20.9
+	graphene-rs@0.20.9
+	graphene-sys@0.20.7
+	gsk4-sys@0.9.6
+	gsk4@0.9.6
+	gtk4-macros@0.9.5
+	gtk4-sys@0.9.6
+	gtk4@0.9.6
+	half@2.4.1
+	hashbrown@0.15.2
+	hashlink@0.10.0
+	heck@0.5.0
+	hermit-abi@0.5.0
+	hex@0.4.3
+	iana-time-zone-haiku@0.1.2
+	iana-time-zone@0.1.61
+	image-webp@0.2.1
+	image@0.25.5
+	imgref@1.11.0
+	indexmap@2.7.1
+	interpolate_name@0.2.4
+	is-terminal@0.4.16
+	is_terminal_polyfill@1.70.1
+	itertools@0.12.1
+	itoa@1.0.15
+	jobserver@0.1.32
+	jpeg-decoder@0.3.1
+	js-sys@0.3.77
+	lazy_static@1.5.0
+	lebe@0.5.2
+	libc@0.2.170
+	libfuzzer-sys@0.4.9
+	libsqlite3-sys@0.32.0
+	linux-raw-sys@0.4.15
+	locale_config@0.3.0
+	log@0.4.26
+	loop9@0.1.5
+	malloc_buf@0.0.6
+	maybe-rayon@0.1.1
+	memchr@2.7.4
+	memoffset@0.9.1
+	minimal-lexical@0.2.1
+	miniz_oxide@0.8.5
+	new_debug_unreachable@1.0.6
+	nom@7.1.3
+	noop_proc_macro@0.3.0
+	num-bigint@0.4.6
+	num-derive@0.4.2
+	num-integer@0.1.46
+	num-rational@0.4.2
+	num-traits@0.2.19
+	objc-foundation@0.1.1
+	objc@0.2.7
+	objc_id@0.1.1
+	once_cell@1.20.3
+	pango-sys@0.20.9
+	pango@0.20.9
+	parking@2.2.1
+	paste@1.0.15
+	pin-project-lite@0.2.16
+	pin-utils@0.1.0
+	pkg-config@0.3.32
+	png@0.17.16
+	ppv-lite86@0.2.20
+	proc-macro-crate@3.3.0
+	proc-macro2@1.0.94
+	profiling-procmacros@1.0.16
+	profiling@1.0.16
+	qoi@0.4.1
+	quick-error@2.0.1
+	quote@1.0.39
+	r-efi@5.3.0
+	rand@0.8.5
+	rand_chacha@0.3.1
+	rand_core@0.6.4
+	rav1e@0.7.1
+	ravif@0.11.11
+	rayon-core@1.12.1
+	rayon@1.10.0
+	regex-automata@0.4.9
+	regex-syntax@0.8.5
+	regex@1.11.1
+	rgb@0.8.50
+	rusqlite@0.34.0
+	rustc_version@0.4.1
+	rustix@0.38.44
+	rustversion@1.0.20
+	ryu@1.0.20
+	same-file@1.0.6
+	semver@1.0.26
+	serde@1.0.218
+	serde_derive@1.0.218
+	serde_json@1.0.140
+	serde_spanned@0.6.8
+	shlex@1.3.0
+	simd-adler32@0.3.7
+	simd_helpers@0.1.0
+	slab@0.4.9
+	smallvec@1.14.0
+	stderrlog@0.6.0
+	strsim@0.11.1
+	strum@0.26.3
+	strum_macros@0.26.4
+	syn@2.0.99
+	system-deps@6.2.2
+	system-deps@7.0.3
+	target-lexicon@0.12.16
+	temp-dir@0.1.14
+	termcolor@1.1.3
+	thiserror-impl@1.0.69
+	thiserror@1.0.69
+	thread_local@1.1.8
+	tiff@0.9.1
+	toml@0.8.20
+	toml_datetime@0.6.8
+	toml_edit@0.22.24
+	unicode-ident@1.0.18
+	utf8parse@0.2.2
+	uuid@1.19.0
+	v_frame@0.3.8
+	vcpkg@0.2.15
+	version-compare@0.2.0
+	walkdir@2.5.0
+	wasi@0.11.0+wasi-snapshot-preview1
+	wasip2@1.0.2+wasi-0.2.9
+	wasm-bindgen-backend@0.2.100
+	wasm-bindgen-macro-support@0.2.100
+	wasm-bindgen-macro@0.2.100
+	wasm-bindgen-shared@0.2.100
+	wasm-bindgen@0.2.100
+	weezl@0.1.8
+	which@7.0.2
+	winapi-i686-pc-windows-gnu@0.4.0
+	winapi-util@0.1.9
+	winapi-x86_64-pc-windows-gnu@0.4.0
+	winapi@0.3.9
+	windows-core@0.52.0
+	windows-link@0.2.1
+	windows-sys@0.59.0
+	windows-targets@0.52.6
+	windows_aarch64_gnullvm@0.52.6
+	windows_aarch64_msvc@0.52.6
+	windows_i686_gnu@0.52.6
+	windows_i686_gnullvm@0.52.6
+	windows_i686_msvc@0.52.6
+	windows_x86_64_gnu@0.52.6
+	windows_x86_64_gnullvm@0.52.6
+	windows_x86_64_msvc@0.52.6
+	winnow@0.7.3
+	winsafe@0.0.19
+	wit-bindgen@0.51.0
+	xdg@2.5.2
+	zerocopy-derive@0.7.35
+	zerocopy@0.7.35
+	zune-core@0.4.12
+	zune-inflate@0.2.54
+	zune-jpeg@0.4.14
+"
+
+inherit cargo gnome2-utils xdg
+
+DESCRIPTION="A GTK GUI wallpaper setter for Wayland compositors"
+HOMEPAGE="https://github.com/nikolaizombie1/waytrogen"
+SRC_URI="
+	https://github.com/nikolaizombie1/${PN}/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz
+	${CARGO_CRATE_URIS}
+"
+
+LICENSE="Unlicense Apache-2.0 BSD ISC MIT Unicode-3.0 ZLIB"
+SLOT="0"
+KEYWORDS="~amd64"
+RESTRICT="test"
+
+RDEPEND="
+	>=dev-db/sqlite-3.42:3
+	>=dev-libs/glib-2.78:2
+	>=gui-libs/gtk-4.12:4
+	sys-devel/gettext
+"
+DEPEND="${RDEPEND}"
+BDEPEND="virtual/pkgconfig"
+
+QA_FLAGS_IGNORED="usr/bin/waytrogen"
+
+src_install() {
+	cargo_src_install
+
+	insinto /usr/share/glib-2.0/schemas
+	doins org.Waytrogen.Waytrogen.gschema.xml
+
+	insinto /usr/share/applications
+	doins waytrogen.desktop
+
+	insinto /usr/share/icons/hicolor/scalable/apps
+	newins README-Assets/WaytrogenLogo.svg waytrogen.svg
+}
+
+pkg_postinst() {
+	gnome2_schemas_update
+	xdg_pkg_postinst
+}
+
+pkg_postrm() {
+	gnome2_schemas_update
+	xdg_pkg_postrm
+}
