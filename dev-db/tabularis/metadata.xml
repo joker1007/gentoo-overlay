@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>kakyoin.hierophant@gmail.com</email>
+		<name>joker1007</name>
+	</maintainer>
+	<longdescription>
+		Open-source desktop SQL workspace with built-in database drivers and shipped plugins,
+		including SQL Server, DuckDB, ClickHouse and Redis. Built-in MCP server, SQL notebooks
+		and visual EXPLAIN. This ebuild installs the official prebuilt binary from the .deb package.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">TabularisDB/tabularis</remote-id>
+	</upstream>
+</pkgmetadata>
