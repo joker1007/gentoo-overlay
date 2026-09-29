@@ -1,0 +1,16 @@
+ReferenceCountedObject::operator new ignores the alignment of over-aligned
+subclasses (roc::VirtualGPU has alignas(64) members). With -march=native
+(AVX) the constructor uses 32-byte aligned stores and crashes randomly.
+--- a/rocclr/include/top.hpp
++++ b/rocclr/include/top.hpp
+@@ -164,6 +164,10 @@
+ 
+   void* operator new(size_t size) { return ::operator new(size); }
+   void operator delete(void* p) { return ::operator delete(p); }
++  // Over-aligned subclasses (e.g. roc::VirtualGPU with alignas(64) members)
++  // must not be allocated with the plain operator new above.
++  void* operator new(size_t size, std::align_val_t al) { return ::operator new(size, al); }
++  void operator delete(void* p, std::align_val_t al) { ::operator delete(p, al); }
+   void* operator new(size_t size, size_t extSize) {
+     return ReferenceCountedObject::operator new(size + extSize);
+   };

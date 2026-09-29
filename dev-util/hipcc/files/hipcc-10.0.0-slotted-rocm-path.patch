@@ -1,0 +1,33 @@
+Gentoo: adapt hipcc to slotted ROCm with system (upstream) LLVM:
+- pass --rocm-path, clang in /usr/lib/llvm/<slot> cannot detect ROCm itself
+- embed RUNPATH of the ROCm prefix (sonames are shared with /usr/lib64)
+- default to the old offload driver for HIP like ROCm's LLVM fork
+--- a/src/hipBin_amd.h
++++ b/src/hipBin_amd.h
+@@ -844,6 +844,26 @@
+     }
+   }
+ 
++  // Gentoo: clang lives in /usr/lib/llvm/<slot>, not under ROCM_PATH, so it
++  // cannot detect the ROCm installation (device libs, HIP headers) by itself.
++  // Also, slotted ROCm shares sonames with the unslotted one in /usr/lib64,
++  // so embed RUNPATH to make binaries use the runtime of this ROCm slot.
++  if (rocm_pathOption_.empty() && !isWindows()) {
++    const string rocmPathArg = " --rocm-path=\"" + roccmPath + "\"";
++    if (hasHIP)
++      HIPCXXFLAGS += rocmPathArg;
++    HIPLDFLAGS += rocmPathArg;
++    HIPLDFLAGS += " -Wl,-rpath,\"" + roccmPath + "/lib\"";
++  }
++
++  // Gentoo: ROCm's LLVM fork uses the old offload driver for HIP by default,
++  // upstream LLVM >= 23 the new one. Keep ROCm's (tested) default.
++  if (toolArgs.find("offload-new-driver") == string::npos && !isWindows()) {
++    if (hasHIP)
++      HIPCXXFLAGS += " --no-offload-new-driver";
++    HIPLDFLAGS += " --no-offload-new-driver";
++  }
++
+   // to avoid using dk linker or MSVC linker
+   if (isWindows()) {
+     fs::path ldPath = hipClangPath;
