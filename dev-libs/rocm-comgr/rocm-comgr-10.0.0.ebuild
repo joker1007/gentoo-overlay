@@ -4,19 +4,22 @@
 EAPI=8
 
 LLVM_COMPAT=( 23 )
-ROCM_SKIP_GLOBALS=1
-inherit cmake llvm-r2 rocm-slot
+
+inherit cmake llvm-r2
 
 MY_P=llvm-project-rocm-${PV}
+MY_TAG=therock-$(ver_cut 1-2)
 components=( "amd/comgr" )
 
 DESCRIPTION="Radeon Open Compute Code Object Manager"
 HOMEPAGE="https://github.com/ROCm/llvm-project/tree/amd-staging/amd/comgr"
-SRC_URI="https://github.com/ROCm/llvm-project/archive/${ROCM_TAG}.tar.gz -> ${MY_P}.tar.gz"
-S="${WORKDIR}/llvm-project-${ROCM_TAG}/${components[0]}"
+SRC_URI="https://github.com/ROCm/llvm-project/archive/${MY_TAG}.tar.gz -> ${MY_P}.tar.gz"
+S="${WORKDIR}/llvm-project-${MY_TAG}/${components[0]}"
 
 LICENSE="MIT"
+SLOT="0/$(ver_cut 1-2)"
 KEYWORDS="~amd64"
+
 IUSE="test"
 RESTRICT="!test? ( test )"
 
@@ -46,7 +49,7 @@ src_unpack() {
 	ebegin "Unpacking from ${archive}"
 	tar -x -z -o \
 		-f "${DISTDIR}/${archive}" \
-		"${components[@]/#/llvm-project-${ROCM_TAG}/}" || die
+		"${components[@]/#/llvm-project-${MY_TAG}/}" || die
 	eend ${?}
 }
 
@@ -70,12 +73,15 @@ src_configure() {
 	llvm_prepend_path "${LLVM_SLOT}"
 
 	local mycmakeargs=(
-		$(rocm_slot_cmake_args)
-		-DCMAKE_STRIP=""  # disable stripping
+		-DCMAKE_STRIP=""  # disable stripping defined at lib/comgr/CMakeLists.txt:58
 		-DBUILD_TESTING=$(usex test ON OFF)
-		-DCOMGR_DISABLE_SPIRV=ON  # requires ROCm/SPIRV-LLVM-Translator
+		-DCOMGR_DISABLE_SPIRV=ON  # requires ROCm/SPIRV-LLVM-Translator (fork of dev-util/spirv-llvm-translator)
 	)
 	# Prevent CMake from finding systemwide hip, which breaks tests
 	use test && mycmakeargs+=( -DCMAKE_DISABLE_FIND_PACKAGE_hip=ON )
 	cmake_src_configure
+}
+
+src_test() {
+	cmake_src_test
 }

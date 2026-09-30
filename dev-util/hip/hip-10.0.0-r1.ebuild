@@ -3,21 +3,21 @@
 
 EAPI=8
 
-ROCM_SKIP_GLOBALS=1
 LLVM_COMPAT=( 23 )
 
-inherit cmake flag-o-matic llvm-r2 rocm-slot
+inherit cmake flag-o-matic llvm-r2
 
 DESCRIPTION="C++ Heterogeneous-Compute Interface for Portability"
 HOMEPAGE="https://github.com/ROCm/rocm-systems/tree/develop/projects/clr"
 SRC_URI="
-	${ROCM_SYSTEMS_URI}/clr.tar.gz -> rocm-clr-${PV}.tar.gz
-	${ROCM_SYSTEMS_URI}/${PN}.tar.gz -> ${P}.tar.gz
+	https://github.com/ROCm/rocm-systems/releases/download/therock-$(ver_cut 1-2)/clr.tar.gz -> rocm-clr-${PV}.tar.gz
+	https://github.com/ROCm/rocm-systems/releases/download/therock-$(ver_cut 1-2)/${PN}.tar.gz -> ${P}.tar.gz
 "
 S="${WORKDIR}/clr"
 HIP_S="${WORKDIR}/hip"
 
 LICENSE="MIT"
+SLOT="0/$(ver_cut 1-2)"
 KEYWORDS="~amd64"
 IUSE="debug"
 
@@ -35,7 +35,7 @@ BDEPEND="
 	dev-util/hipcc:${SLOT}
 "
 RDEPEND="${DEPEND}
-	~dev-libs/rocm-core-${PV}:${SLOT}
+	~dev-libs/rocm-core-${PV}
 	dev-util/hipcc:${SLOT}
 	dev-libs/rocm-device-libs:${SLOT}
 "
@@ -48,12 +48,15 @@ PATCHES=(
 	"${FILESDIR}/${PN}-10.0.0-aligned-new.patch"
 )
 
-QA_FLAGS_IGNORED="${ROCM_PREFIX#/}/lib/libhiprtc-builtins.*"
+QA_FLAGS_IGNORED="usr/lib.*/libhiprtc-builtins.*"
 
 src_prepare() {
 	pushd "${HIP_S}" >/dev/null || die
-	# FindHIP.cmake: set HIP and HIP Clang paths directly, don't search using heuristics
-	sed -e "s:# Search for HIP installation:set(HIP_ROOT_DIR \"$(rocm_slot_prefix)\"):" \
+
+	# hipamd is itself built by cmake, and should never provide a
+	# FindHIP.cmake module. But the reality is some package relies on it.
+	# Set HIP and HIP Clang paths directly, don't search using heuristics
+	sed -e "s:# Search for HIP installation:set(HIP_ROOT_DIR \"${EPREFIX}/usr\"):" \
 		-e "s:#Set HIP_CLANG_PATH:set(HIP_CLANG_PATH \"$(get_llvm_prefix -d)/bin\"):" \
 		-i "cmake/FindHIP.cmake" || die
 	popd >/dev/null || die
@@ -78,6 +81,8 @@ src_prepare() {
 src_configure() {
 	# -Werror=strict-aliasing
 	# https://bugs.gentoo.org/858383
+	# https://github.com/ROCm/clr/issues/64
+	#
 	# Do not trust it for LTO either
 	append-flags -fno-strict-aliasing
 	filter-lto
@@ -85,10 +90,12 @@ src_configure() {
 	use debug && CMAKE_BUILD_TYPE="Debug"
 
 	# Fix ld.lld linker error: https://github.com/ROCm/HIP/issues/3382
+	# See also: https://github.com/gentoo/gentoo/pull/29097
 	append-ldflags $(test-flags-CCLD -Wl,--undefined-version)
 
 	local mycmakeargs=(
-		$(rocm_slot_cmake_args)
+		-DCMAKE_PREFIX_PATH="$(get_llvm_prefix)"
+		-DCMAKE_SKIP_RPATH=ON
 		-D__HIP_ENABLE_PCH=OFF
 
 		-DCLR_BUILD_HIP=ON
@@ -96,7 +103,8 @@ src_configure() {
 
 		-DHIP_COMMON_DIR="${HIP_S}"
 		-DHIP_ENABLE_ROCPROFILER_REGISTER=OFF
-		-DHIPCC_BIN_DIR="$(rocm_slot_prefix)/bin"
+		-DHIPCC_BIN_DIR="${EPREFIX}/usr/bin"
+		-DROCM_PATH="${EPREFIX}/usr"
 
 		-DHIP_PLATFORM="amd"
 		-DOpenGL_GL_PREFERENCE="GLVND"
@@ -106,4 +114,14 @@ src_configure() {
 	)
 
 	cmake_src_configure
+}
+
+src_install() {
+	cmake_src_install
+
+	# clang >= 23 links the HIP runtime as "<ROCm path>/lib/libamdhip64.so"
+	# (--hip-link), and detects /usr as ROCm path; libdir is not considered
+	if [[ $(get_libdir) != lib ]]; then
+		dosym -r "/usr/$(get_libdir)/libamdhip64.so" /usr/lib/libamdhip64.so
+	fi
 }

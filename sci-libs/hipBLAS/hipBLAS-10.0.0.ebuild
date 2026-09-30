@@ -3,17 +3,20 @@
 
 EAPI=8
 
-LLVM_COMPAT=( 23 )
-inherit cmake fortran-2 llvm-r2 rocm-slot
+ROCM_VERSION=${PV}
+
+inherit cmake fortran-2 rocm
 
 DESCRIPTION="ROCm BLAS marshalling library"
 HOMEPAGE="https://github.com/ROCm/rocm-libraries/tree/develop/projects/hipblas"
-SRC_URI="${ROCM_LIBRARIES_URI}/hipblas.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/ROCm/rocm-libraries/releases/download/therock-$(ver_cut 1-2)/hipblas.tar.gz -> ${P}.tar.gz"
 S="${WORKDIR}/hipblas"
 
-LICENSE="MIT"
-KEYWORDS="~amd64"
 REQUIRED_USE="${ROCM_REQUIRED_USE}"
+
+LICENSE="MIT"
+SLOT="0/$(ver_cut 1-2)"
+KEYWORDS="~amd64"
 
 RDEPEND="
 	sci-libs/rocBLAS:${SLOT}[${ROCM_USEDEP}]
@@ -28,17 +31,11 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-6.3.0-no-git.patch
 )
 
-pkg_setup() {
-	llvm-r2_pkg_setup
-	fortran-2_pkg_setup
-}
-
 src_configure() {
 	rocm_use_clang
 
 	local mycmakeargs=(
-		$(rocm_slot_cmake_args)
-		# hipBLAS is a wrapper of rocBLAS which has tests
+		# currently hipBLAS is a wrapper of rocBLAS which has tests, so no need to perform test here
 		-DBUILD_CLIENTS_TESTS=OFF
 		-DBUILD_CLIENTS_BENCHMARKS=OFF
 		-DROCM_SYMLINK_LIBS=OFF

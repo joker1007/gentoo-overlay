@@ -3,16 +3,16 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..14} )
-ROCM_SKIP_GLOBALS=1
-inherit cmake python-single-r1 rocm-slot
+PYTHON_COMPAT=( python3_{11..14} python3_13t )
+inherit cmake python-r1
 
 DESCRIPTION="ROCm Application for Reporting System Info"
 HOMEPAGE="https://github.com/ROCm/rocm-systems/tree/develop/projects/rocminfo"
-SRC_URI="${ROCM_SYSTEMS_URI}/${PN}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/ROCm/rocm-systems/releases/download/therock-$(ver_cut 1-2)/${PN}.tar.gz -> ${P}.tar.gz"
 S="${WORKDIR}/${PN}"
 
 LICENSE="UoI-NCSA"
+SLOT="0/$(ver_cut 1-2)"
 KEYWORDS="~amd64"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
@@ -28,14 +28,12 @@ src_prepare() {
 }
 
 src_configure() {
-	local mycmakeargs=(
-		$(rocm_slot_cmake_args)
-		-DROCRTST_BLD_TYPE=Release
-	)
+	local mycmakeargs=( -DROCRTST_BLD_TYPE=Release )
 	cmake_src_configure
 }
 
 src_install() {
 	cmake_src_install
-	python_fix_shebang "${ED}${ROCM_PREFIX}/bin/rocm_agent_enumerator"
+	rm "${ED}/usr/bin/rocm_agent_enumerator" || die
+	python_foreach_impl python_doexe rocm_agent_enumerator "${BUILD_DIR}"/rocm_agent_enumerator
 }

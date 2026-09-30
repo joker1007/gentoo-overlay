@@ -3,21 +3,26 @@
 
 EAPI=8
 
-ROCM_SKIP_GLOBALS=1
-inherit cmake rocm-slot
+inherit cmake
 
 DESCRIPTION="Library that provides ROCm release version and install path information"
 HOMEPAGE="https://github.com/ROCm/rocm-systems/tree/develop/projects/rocm-core"
-SRC_URI="${ROCM_SYSTEMS_URI}/${PN}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/ROCm/rocm-systems/releases/download/therock-$(ver_cut 1-2)/${PN}.tar.gz -> ${P}.tar.gz"
 S="${WORKDIR}/${PN}"
 
 LICENSE="MIT"
+SLOT="0/$(ver_cut 1-2)"
 KEYWORDS="~amd64"
 
+RDEPEND="!<dev-util/hip-7.0"
+
 src_configure() {
-	local mycmakeargs=(
-		$(rocm_slot_cmake_args)
-		-DROCM_VERSION=${PV}
-	)
+	local mycmakeargs=( -DROCM_VERSION=${PV} )
 	cmake_src_configure
+}
+
+src_install() {
+	cmake_src_install
+	# too broad for standard directory
+	rm "${ED}"/usr/.info/version || die
 }

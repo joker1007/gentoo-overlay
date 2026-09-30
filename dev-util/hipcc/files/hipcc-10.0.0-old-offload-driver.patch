@@ -1,0 +1,19 @@
+Default to the old offload driver for HIP like ROCm's LLVM fork does;
+upstream LLVM >= 23 defaults to the new one.
+--- a/src/hipBin_amd.h
++++ b/src/hipBin_amd.h
+@@ -844,6 +844,14 @@
+     }
+   }
+ 
++  // Gentoo: ROCm's LLVM fork uses the old offload driver for HIP by default,
++  // upstream LLVM >= 23 the new one. Keep ROCm's (tested) default.
++  if (toolArgs.find("offload-new-driver") == string::npos && !isWindows()) {
++    if (hasHIP)
++      HIPCXXFLAGS += " --no-offload-new-driver";
++    HIPLDFLAGS += " --no-offload-new-driver";
++  }
++
+   // to avoid using dk linker or MSVC linker
+   if (isWindows()) {
+     fs::path ldPath = hipClangPath;

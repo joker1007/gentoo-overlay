@@ -5,21 +5,23 @@ EAPI=8
 
 LLVM_COMPAT=( 23 )
 PYTHON_COMPAT=( python3_{12..14} )
+ROCM_VERSION=${PV}
 
-inherit cmake flag-o-matic llvm-r2 multiprocessing python-any-r1 rocm-slot
+inherit cmake flag-o-matic llvm-r2 multiprocessing python-any-r1 rocm
 
 DESCRIPTION="AMD's library for BLAS on ROCm"
 HOMEPAGE="https://github.com/ROCm/rocm-libraries/tree/develop/projects/rocblas"
 # Tensile is only used at build time to generate GEMM kernels; it is used
-# in-tree instead of a slotted dev-util/Tensile (python modules would collide).
+# in-tree instead of a separate dev-util/Tensile.
 SRC_URI="
-	${ROCM_LIBRARIES_URI}/rocblas.tar.gz -> rocblas-${PV}.tar.gz
-	${ROCM_LIBRARIES_URI}/tensile.tar.gz -> tensile-${PV}.tar.gz
+	https://github.com/ROCm/rocm-libraries/releases/download/therock-$(ver_cut 1-2)/rocblas.tar.gz -> rocblas-${PV}.tar.gz
+	https://github.com/ROCm/rocm-libraries/releases/download/therock-$(ver_cut 1-2)/tensile.tar.gz -> tensile-${PV}.tar.gz
 "
 S="${WORKDIR}/rocblas"
 TENSILE_S="${WORKDIR}/tensile"
 
 LICENSE="MIT BSD"
+SLOT="0/$(ver_cut 1-2)"
 KEYWORDS="~amd64"
 REQUIRED_USE="${ROCM_REQUIRED_USE}"
 RESTRICT="test"
@@ -32,7 +34,7 @@ DEPEND="
 	>=dev-cpp/msgpack-cxx-6.0.0
 "
 BDEPEND="
-	dev-build/rocm-cmake:${SLOT}
+	dev-build/rocm-cmake
 	$(python_gen_any_dep '
 		dev-python/joblib[${PYTHON_USEDEP}]
 		dev-python/msgpack[${PYTHON_USEDEP}]
@@ -41,7 +43,7 @@ BDEPEND="
 	')
 "
 
-QA_FLAGS_IGNORED="${ROCM_PREFIX#/}/lib/rocblas/library/.*"
+QA_FLAGS_IGNORED="/usr/lib64/rocblas/library/.*"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-7.1.0-no-git.patch
@@ -63,10 +65,10 @@ pkg_setup() {
 src_prepare() {
 	cmake_src_prepare
 
-	# Tensile: use clang of LLVM_SLOT instead of amdclang
+	# Tensile: accept ${CHOST}-clang(++) of LLVM_SLOT (see rocm_use_clang) instead of amdclang
 	pushd "${TENSILE_S}/Tensile" >/dev/null || die
-	sed -e "s/amdclang/clang/g" -i Utilities/Toolchain.py Common.py || die
-	sed -e "/HipClangVersion/s/0.0.0/$("$(rocm_slot_prefix)"/bin/hipconfig -v)/" -i Common.py || die
+	sed -e "s/amdclang/${CHOST}-clang/g" -i Utilities/Toolchain.py Common.py || die
+	sed -e "/HipClangVersion/s/0.0.0/$(hipconfig -v)/" -i Common.py || die
 	popd >/dev/null || die
 }
 
@@ -78,7 +80,7 @@ src_configure() {
 	append-cxxflags -Wno-explicit-specialization-storage-class -Wno-unused-value
 
 	local mycmakeargs=(
-		$(rocm_slot_cmake_args)
+		-DCMAKE_SKIP_RPATH=ON
 		-DROCM_SYMLINK_LIBS=OFF
 		-DGPU_TARGETS="$(get_amdgpu_flags)"
 		-DBUILD_WITH_TENSILE=ON
@@ -104,5 +106,5 @@ src_install() {
 
 	# Stop llvm-strip from removing .strtab section from *.hsaco files,
 	# otherwise rocclr/elf/elf.cpp complains with "failed: null sections(STRTAB)" and crashes
-	dostrip -x "${ROCM_PREFIX}/lib/rocblas/library/"
+	dostrip -x "/usr/$(get_libdir)/rocblas/library/"
 }
