@@ -38,7 +38,6 @@ RDEPEND="${DEPEND}
 	~dev-libs/rocm-core-${PV}:${SLOT}
 	dev-util/hipcc:${SLOT}
 	dev-libs/rocm-device-libs:${SLOT}
-	dev-libs/roct-thunk-interface:${SLOT}
 "
 
 PATCHES=(
