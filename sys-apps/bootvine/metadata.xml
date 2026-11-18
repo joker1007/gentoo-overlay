@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>kakyoin.hierophant@gmail.com</email>
+		<name>joker1007</name>
+	</maintainer>
+	<use>
+		<flag name="openrc">Build support for following the boot under <pkg>sys-apps/openrc</pkg> and install its init script</flag>
+		<flag name="systemd">Build support for following boot and shutdown under <pkg>sys-apps/systemd</pkg> and install its units and dracut module</flag>
+	</use>
+	<upstream>
+		<remote-id type="codeberg">wvhulle/bootvine</remote-id>
+		<bug-tracker>https://codeberg.org/wvhulle/bootvine/issues</bug-tracker>
+	</upstream>
+</pkgmetadata>
